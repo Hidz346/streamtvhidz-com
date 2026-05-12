@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiDZ TV</title>
+    <link rel="icon" type="image/jpeg" href="https://www.gobox.my.id/file/hNSOM.jpg">
+    <link rel="apple-touch-icon" href="https://www.gobox.my.id/file/hNSOM.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #010101;
+            color: white;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradient-x {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .animate-gradient-x {
+            background-size: 200% 200%;
+            animation: gradient-x 5s ease infinite;
+        }
+
+        .animate-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .sticky-player {
+            position: sticky;
+            top: 3.5rem;
+            z-index: 90;
+        }
+
+        .rgb-text {
+            background: linear-gradient(to right, #22c55e, #3b82f6, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #_shield { position:fixed; inset:0; z-index:99999; background:#010101; display:flex; align-items:center; justify-content:center; }
+        #_shield p { color:#ef4444; font-family:'Inter',sans-serif; font-weight:900; font-size:1.2rem; text-transform:uppercase; letter-spacing:0.3em; }
+    </style>
+</head>
+<body>
+
+    <!-- Zero-Exposure Shield -->
+    <div id="_shield"><p>Akses Ditolak</p></div>
+
+    <!-- Header Statis / Watermark -->
+    <header class="fixed top-0 inset-x-0 h-14 flex items-center justify-between px-6 z-[100] bg-black/90 backdrop-blur-xl border-b border-white/[0.05]">
+        <div onclick="showPage('home')" class="cursor-pointer select-none transition-all hover:brightness-125 italic flex items-center">
+            <span class="text-lg font-[1000] tracking-tighter rgb-text animate-gradient-x">HiDZ</span>
+            <span class="text-white font-[1000] text-lg ml-1">TV</span>
+        </div>
+        <div onclick="showPage('dev')" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 cursor-pointer active:scale-90 transition-all hover:bg-blue-600">
+            <i data-lucide="user" class="w-4 h-4"></i>
+        </div>
+    </header>
+
+    <!-- Dynamic Content Area -->
+    <div id="main-content" class="pb-32"></div>
+
+    <!-- Navigasi Bawah -->
+    <nav class="fixed bottom-0 inset-x-0 h-16 bg-black/95 backdrop-blur-2xl border-t border-white/5 flex items-center justify-around z-[100] px-10 shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
+        <button onclick="showPage('home')" id="nav-home" class="flex flex-col items-center gap-1 transition-all duration-300 active:scale-75 text-blue-500">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span class="text-[8px] font-[1000] uppercase tracking-[0.2em] italic">BERANDA</span>
+        </button>
+        
+        <div class="opacity-[0.01] scale-50 pointer-events-none">
+           <i data-lucide="monitor" class="w-5 h-5"></i>
+        </div>
+
+        <button onclick="showPage('dev')" id="nav-dev" class="flex flex-col items-center gap-1 transition-all duration-300 active:scale-75 text-gray-500 hover:text-white">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span class="text-[8px] font-[1000] uppercase tracking-[0.2em] italic">PENGEMBANG</span>
+        </button>
+    </nav>
+
+    <script>
+    // ╔══════════════════════════════════════════════════════════════╗
+    // ║          ZERO-EXPOSURE ARCHITECTURE v2.0 by HiDZ           ║
+    // ║  7-Layer Protection: Encrypt · Shield · Cloak · Guard ·    ║
+    // ║  Purge · Fortify · Sentinel                                ║
+    // ╚══════════════════════════════════════════════════════════════╝
+    ;(function(){
+        'use strict';
+
+        // ═══════════════════════════════════════
+        // LAYER 1: ANTI-DEVTOOLS DETECTION
+        // ═══════════════════════════════════════
+        var _s = document.getElementById('_shield');
+        var _ok = false;
+
+        // Timing-based debugger detection
+        function _td() {
+            var a = performance.now();
+            debugger;
+            return (performance.now() - a) > 100;
+        }
+
+        // Window size delta detection (DevTools docked)
+        function _wd() {
+            var t = window.outerWidth - window.innerWidth > 160;
+            var h = window.outerHeight - window.innerHeight > 160;
+            return t || h;
+        }
+
+        // Console method detection
+        function _cd() {
+            var el = new Image();
+            var _d = false;
+            Object.defineProperty(el, 'id', { get: function() { _d = true; } });
+            console.log('%c', el);
+            return _d;
+        }
+
+        function _checkEnv() {
+            if (_wd() || _cd()) {
+                _lockdown();
+                return false;
+            }
+            return true;
+        }
+
+        function _lockdown() {
+            _ok = false;
+            if (_s) _s.style.display = 'flex';
+            var mc = document.getElementById('main-content');
+            if (mc) mc.innerHTML = '';
+            if (typeof hlsInstance !== 'undefined' && hlsInstance) {
+                hlsInstance.destroy();
+            }
+        }
+
+        // ═══════════════════════════════════════
+        // LAYER 2: KEYBOARD & CONTEXT PROTECTION
+        // ═══════════════════════════════════════
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+        
+        document.addEventListener('keydown', function(e) {
+            // F12
+            if (e.keyCode === 123) { e.preventDefault(); _lockdown(); return false; }
+            // Ctrl+Shift+I/J/C
+            if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) { e.preventDefault(); _lockdown(); return false; }
+            // Ctrl+U (view source)
+            if (e.ctrlKey && e.keyCode === 85) { e.preventDefault(); return false; }
+            // Ctrl+S (save)
+            if (e.ctrlKey && e.keyCode === 83) { e.preventDefault(); return false; }
+        });
+
+        // ═══════════════════════════════════════
+        // LAYER 3: CONSOLE NEUTRALIZATION
+        // ═══════════════════════════════════════
+        var _noop = function() { return undefined; };
+        var _cMethods = ['log','warn','error','info','debug','table','trace','dir','dirxml','group','groupEnd','groupCollapsed','time','timeEnd','profile','profileEnd','count','assert'];
+        _cMethods.forEach(function(m) {
+            try { window.console[m] = _noop; } catch(e) {}
+        });
+        try {
+            Object.defineProperty(window, 'console', {
+                get: function() {
+                    return new Proxy({}, { get: function() { return _noop; } });
+                },
+                set: function() {},
+                configurable: false
+            });
+        } catch(e) {}
+
+        // ═══════════════════════════════════════
+        // LAYER 4: AES-256-GCM ENCRYPTED PAYLOAD
+        // ═══════════════════════════════════════
+        var _0x = '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';
+        var _1x = 'MWXlmYNYP334t/uk';
+        var _2x = 'DjOGgWn3qbeMYdzWC6htKg==';
+
+        // Key fragments (reversed, scattered)
+        var _a = '2fdc91c88825b716';
+        var _b = 'd138e4fc308f29e0';
+        var _c = '4ef77600c9447ae2';
+        var _d = '6e49d40d22e1bc37';
+
+        function _rv(s) { return s.split('').reverse().join(''); }
+        function _hx(hex) {
+            var bytes = new Uint8Array(hex.length / 2);
+            for (var i = 0; i < hex.length; i += 2) {
+                bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+            }
+            return bytes;
+        }
+        function _b64(b64) {
+            var bin = atob(b64);
+            var bytes = new Uint8Array(bin.length);
+            for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            return bytes;
+        }
+
+        async function _decrypt() {
+            var keyHex = _rv(_a) + _rv(_b) + _rv(_c) + _rv(_d);
+            var keyBytes = _hx(keyHex);
+            var ivBytes = _b64(_1x);
+            var encBytes = _b64(_0x);
+            var tagBytes = _b64(_2x);
+
+            var combined = new Uint8Array(encBytes.length + tagBytes.length);
+            combined.set(encBytes);
+            combined.set(tagBytes, encBytes.length);
+
+            var cryptoKey = await crypto.subtle.importKey(
+                'raw', keyBytes, { name: 'AES-GCM' }, false, ['decrypt']
+            );
+
+            var decrypted = await crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv: ivBytes }, cryptoKey, combined
+            );
+
+            return JSON.parse(new TextDecoder().decode(decrypted));
+        }
+
+        // ═══════════════════════════════════════
+        // LAYER 5: DOM MUTATION SENTINEL
+        // ═══════════════════════════════════════
+        var _observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(m) {
+                if (m.type === 'childList') {
+                    m.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1) {
+                            var tag = node.tagName.toLowerCase();
+                            if (tag === 'script' && !node.src && !node.hasAttribute('data-zea')) {
+                                node.remove();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        _observer.observe(document.documentElement, { childList: true, subtree: true });
+
+        // ═══════════════════════════════════════
+        // LAYER 6: SOURCE SANITIZATION
+        // ═══════════════════════════════════════
+        function _sanitizeVideoSrc() {
+            setTimeout(function() {
+                var video = document.getElementById('video-player');
+                if (video) {
+                    video.removeAttribute('src');
+                    video.removeAttribute('currentSrc');
+                    var sources = video.querySelectorAll('source');
+                    sources.forEach(function(s) { s.remove(); });
+                }
+            }, 2000);
+        }
+
+        // ═══════════════════════════════════════
+        // LAYER 7: CONTINUOUS INTEGRITY MONITOR
+        // ═══════════════════════════════════════
+        setInterval(function() {
+            _checkEnv();
+        }, 3000);
+
+        // Override toString to prevent function inspection
+        Function.prototype.toString = (function(_orig) {
+            return function() {
+                if (this === Function.prototype.toString) return 'function toString() { [native code] }';
+                if (typeof this._native !== 'undefined') return 'function ' + (this.name || '') + '() { [native code] }';
+                return _orig.call(this);
+            };
+        })(Function.prototype.toString);
+
+        // ═══════════════════════════════════════
+        // APPLICATION CORE (Protected Runtime)
+        // ═══════════════════════════════════════
+        var CHANNELS = [];
+        var hlsInstance = null;
+
+        async function initApp() {
+            if (!_checkEnv()) return;
+
+            try {
+                var raw = await _decrypt();
+                var counts = {};
+                CHANNELS = raw.map(function(ch, index) {
+                    counts[ch.name] = (counts[ch.name] || 0) + 1;
+                    var finalName = counts[ch.name] > 1 ? ch.name + ' ' + counts[ch.name] : ch.name;
+                    return {
+                        name: ch.name,
+                        url: ch.url,
+                        color: ch.color,
+                        id: index,
+                        displayName: finalName,
+                        match: Math.floor(Math.random() * 15 + 85) + '%',
+                        rating: (Math.random() * 1.5 + 8).toFixed(1)
+                    };
+                });
+
+                _ok = true;
+                if (_s) _s.style.display = 'none';
+                showPage('home');
+                lucide.createIcons();
+            } catch(e) {
+                _lockdown();
+            }
+        }
+
+        function _getUrl(ch) {
+            if (!_ok) return '';
+            return ch.url;
+        }
+
+        function createBannerHTML(ch, size) {
+            var isLarge = size === 'large';
+            return '<div class="w-full h-full bg-gradient-to-br ' + ch.color + ' flex items-center justify-center relative overflow-hidden group-hover:scale-105 transition-all duration-1000">' +
+                '<div class="absolute inset-0 flex flex-wrap gap-2 items-center justify-center opacity-[0.03] pointer-events-none rotate-[-15deg] scale-150">' +
+                Array(10).fill('<span class="text-xl font-black uppercase tracking-tighter">' + ch.name + '</span>').join('') +
+                '</div>' +
+                '<div class="relative z-10 p-4 text-center">' +
+                '<span class="' + (isLarge ? 'text-4xl md:text-7xl' : 'text-xl md:text-2xl') + ' font-[1000] text-white tracking-[-0.05em] uppercase italic leading-none drop-shadow-lg">' +
+                ch.displayName +
+                '</span></div>' +
+                '<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/10"></div></div>';
+        }
+
+        window.showPage = function(pageName, channelId) {
+            if (!_ok && pageName !== 'dev') return;
+            var container = document.getElementById('main-content');
+            var navHome = document.getElementById('nav-home');
+            var navDev = document.getElementById('nav-dev');
+
+            navHome.classList.remove('text-blue-500');
+            navHome.classList.add('text-gray-500');
+            navDev.classList.remove('text-blue-500');
+            navDev.classList.add('text-gray-500');
+
+            if (hlsInstance) {
+                hlsInstance.destroy();
+                hlsInstance = null;
+            }
+
+            if (pageName === 'home') {
+                navHome.classList.add('text-blue-500');
+                var firstCh = CHANNELS[0];
+                container.innerHTML =
+                    '<div class="pt-14 animate-in">' +
+                    '<section class="relative h-[65vh] flex flex-col justify-end p-6 md:p-12 overflow-hidden">' +
+                    '<div class="absolute inset-0 z-0">' + createBannerHTML(firstCh, 'large') + '</div>' +
+                    '<div class="absolute inset-0 bg-gradient-to-t from-[#010101] via-transparent to-transparent"></div>' +
+                    '<div class="absolute inset-0 bg-gradient-to-r from-[#010101]/80 to-transparent"></div>' +
+                    '<div class="relative z-10 max-w-2xl space-y-4">' +
+                    '<h2 class="text-4xl md:text-7xl font-[1000] leading-none tracking-tighter uppercase italic">' + firstCh.displayName + '</h2>' +
+                    '<div class="flex items-center gap-4 text-xs font-bold text-gray-400">' +
+                    '<span class="text-green-500 font-black">' + firstCh.match + ' Match</span>' +
+                    '<span class="bg-white/10 px-2 py-0.5 rounded text-[10px] uppercase font-black tracking-widest">Ultra HD</span></div>' +
+                    '<button onclick="showPage(\'watch\', 0)" class="bg-white text-black px-8 py-3 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-blue-600 hover:text-white active:scale-95 transition-all uppercase tracking-widest shadow-xl w-fit">' +
+                    '<i data-lucide="play" class="w-4 h-4 fill-current"></i> Tonton</button></div></section>' +
+                    '<section class="px-6 md:px-12 mt-10 space-y-6">' +
+                    '<h3 class="text-xs font-black uppercase tracking-[0.4em] flex items-center gap-2 italic text-gray-500">SEMUA SALURAN <i data-lucide="chevron-right" class="w-4 h-4 text-blue-500"></i></h3>' +
+                    '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">' +
+                    CHANNELS.map(function(ch) {
+                        return '<div onclick="showPage(\'watch\', ' + ch.id + ')" class="group cursor-pointer rounded-2xl overflow-hidden bg-[#080808] border border-white/[0.05] hover:border-blue-600 transition-all duration-300 shadow-xl active:scale-95 channel-card">' +
+                            '<div class="aspect-video relative overflow-hidden bg-black">' + createBannerHTML(ch) +
+                            '<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/40">' +
+                            '<i data-lucide="play" class="w-6 h-6 fill-white text-white"></i></div></div>' +
+                            '<div class="p-4 space-y-1"><h4 class="font-black text-[10px] md:text-[11px] uppercase truncate tracking-widest">' + ch.displayName + '</h4>' +
+                            '<span class="text-[9px] text-green-500 font-black italic">' + ch.match + ' Match</span></div></div>';
+                    }).join('') +
+                    '</div></section></div>';
+
+            } else if (pageName === 'watch') {
+                navHome.classList.add('text-blue-500');
+                var ch = CHANNELS[channelId];
+                var others = CHANNELS.filter(function(c) { return c.id !== ch.id; });
+                var recs = others.slice(0, 4);
+                var more = others.slice(4);
+
+                container.innerHTML =
+                    '<div class="pt-14 animate-in">' +
+                    '<div class="sticky-player w-full bg-black shadow-2xl"><div class="relative w-full aspect-video bg-black overflow-hidden group">' +
+                    '<video id="video-player" class="w-full h-full object-contain" playsinline autoplay></video></div></div>' +
+                    '<div class="max-w-[1400px] mx-auto px-6 md:px-12 mt-8 pb-20">' +
+                    '<button onclick="showPage(\'home\')" class="flex items-center gap-2 text-gray-500 hover:text-white mb-6 text-[10px] font-black uppercase tracking-[0.4em] transition-all bg-white/5 px-4 py-2 rounded-full w-fit active:scale-90">' +
+                    '<i data-lucide="arrow-left" class="w-3 h-3"></i> Beranda</button>' +
+                    '<div class="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start"><div class="lg:col-span-2 space-y-10"><div class="space-y-4">' +
+                    '<h2 class="text-3xl md:text-6xl font-[1000] tracking-tighter uppercase italic">' + ch.displayName + '</h2>' +
+                    '<div class="flex flex-wrap items-center gap-4 md:gap-6 text-[10px] md:text-xs font-black tracking-widest italic text-gray-400">' +
+                    '<span class="text-green-500">SIARAN AKTIF ' + ch.match + '</span>' +
+                    '<span class="flex items-center gap-1 text-yellow-500"><i data-lucide="star" class="w-3 h-3 fill-current"></i> ' + ch.rating + '</span>' +
+                    '<span class="border border-white/20 px-2 py-0.5 rounded text-[9px] bg-white/5 font-black uppercase">Original HD</span></div>' +
+                    '<div class="flex flex-wrap items-center gap-3 pt-3">' +
+                    '<button onclick="toggleFullscreen()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-full font-[900] text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-[0_0_15px_rgba(37,99,235,0.4)]">' +
+                    '<i data-lucide="maximize-2" class="w-4 h-4"></i> Layar Penuh</button>' +
+                    '<button onclick="togglePiP()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-full font-[900] text-[10px] uppercase tracking-widest transition-all active:scale-95 border border-white/10 shadow-lg">' +
+                    '<i data-lucide="external-link" class="w-4 h-4"></i> PiP Mode</button></div></div>' +
+                    '<div class="space-y-6 pt-6 border-t border-white/5">' +
+                    '<h3 class="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500 italic">Pilihan Terpopuler</h3>' +
+                    '<div class="grid grid-cols-1 gap-4">' +
+                    recs.map(function(r) {
+                        return '<div onclick="showPage(\'watch\', ' + r.id + ')" class="flex gap-4 bg-[#080808] p-3 rounded-2xl cursor-pointer hover:bg-white/5 border border-transparent hover:border-blue-500/30 transition-all group active:scale-95">' +
+                            '<div class="w-24 md:w-32 aspect-video overflow-hidden rounded-xl shrink-0">' + createBannerHTML(r) + '</div>' +
+                            '<div class="flex flex-col justify-center overflow-hidden">' +
+                            '<h4 class="text-[10px] md:text-xs font-black uppercase tracking-widest truncate group-hover:text-blue-500">' + r.displayName + '</h4>' +
+                            '<span class="text-[9px] text-gray-600 font-bold uppercase italic mt-1">' + r.match + ' Match</span></div></div>';
+                    }).join('') +
+                    '</div></div></div>' +
+                    '<div class="hidden lg:block space-y-6 bg-white/5 p-6 rounded-[2rem] border border-white/5">' +
+                    '<h4 class="text-[10px] font-black uppercase tracking-widest text-gray-500">Status Jaringan</h4>' +
+                    '<div class="flex items-center gap-3"><div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]"></div>' +
+                    '<span class="text-[11px] font-black">Connected (Fast Stream)</span></div>' +
+                    '<p class="text-[10px] leading-relaxed text-gray-500 uppercase font-medium">Sistem adaptif HiDZ menyajikan streaming tanpa buffer untuk kualitas Ultra HD.</p>' +
+                    '</div></div>' +
+                    '<div class="mt-16 space-y-6">' +
+                    '<h3 class="text-[10px] font-black uppercase tracking-[0.5em] text-gray-600 italic">Jelajahi Saluran Lainnya</h3>' +
+                    '<div class="flex overflow-x-auto gap-4 md:gap-6 pb-10 no-scrollbar scroll-smooth">' +
+                    more.map(function(m) {
+                        return '<div onclick="showPage(\'watch\', ' + m.id + ')" class="flex-none w-48 md:w-56 group cursor-pointer transition-all active:scale-90">' +
+                            '<div class="aspect-video relative overflow-hidden rounded-2xl border border-white/5 group-hover:border-blue-600 transition-all bg-black shadow-lg">' +
+                            createBannerHTML(m) +
+                            '<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">' +
+                            '<i data-lucide="play" class="w-6 h-6 fill-white text-white"></i></div></div>' +
+                            '<h4 class="mt-4 font-black text-[9px] md:text-[10px] uppercase tracking-widest text-gray-500 group-hover:text-white transition-colors italic truncate">' + m.displayName + '</h4></div>';
+                    }).join('') +
+                    '</div></div></div></div>';
+
+                // Secure stream loading
+                var video = document.getElementById('video-player');
+                var streamUrl = _getUrl(ch);
+                if (Hls.isSupported()) {
+                    hlsInstance = new Hls({
+                        enableWorker: true,
+                        xhrSetup: function(xhr) {
+                            xhr.withCredentials = false;
+                        }
+                    });
+                    hlsInstance.loadSource(streamUrl);
+                    hlsInstance.attachMedia(video);
+                    hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+                        video.play().catch(function() {});
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = streamUrl;
+                    video.addEventListener('loadedmetadata', function() {
+                        video.play().catch(function() {});
+                    });
+                }
+
+                // Sanitize DOM after stream loads
+                _sanitizeVideoSrc();
+
+                video.addEventListener('leavepictureinpicture', function() {
+                    setTimeout(function() {
+                        if (video.paused) video.play().catch(function() {});
+                    }, 100);
+                });
+
+            } else if (pageName === 'dev') {
+                navDev.classList.add('text-blue-500');
+                container.innerHTML =
+                    '<div class="pt-32 px-6 max-w-4xl mx-auto text-center animate-in">' +
+                    '<h2 class="text-5xl md:text-8xl font-[1000] uppercase tracking-tighter mb-4 italic drop-shadow-lg">' +
+                    '<span class="rgb-text animate-gradient-x">HiDZ</span> TV</h2>' +
+                    '<p class="text-blue-500 text-xs font-black uppercase tracking-[0.8em] mb-12 italic">Developer: HiDZ</p>' +
+                    '<div class="max-w-xl mx-auto bg-white/5 p-10 rounded-[2.5rem] border border-white/10 shadow-2xl backdrop-blur-xl">' +
+                    '<p class="text-gray-400 text-lg md:text-xl leading-relaxed italic font-medium">' +
+                    '"Menyajikan pengalaman menonton televisi digital yang lebih rapi, ringan, dan lengkap dengan teknologi streaming terbaru."</p></div>' +
+                    '<div class="mt-8 flex flex-col items-center gap-2">' +
+                    '<div class="flex items-center gap-2 text-[9px] font-black text-emerald-500 uppercase tracking-[0.5em]">' +
+                    '<i data-lucide="shield-check" class="w-4 h-4"></i> Zero-Exposure Architecture v2.0</div>' +
+                    '<p class="text-[8px] text-gray-600 uppercase tracking-widest">7-Layer Security | AES-256-GCM Encrypted</p></div>' +
+                    '<button onclick="showPage(\'home\')" class="mt-16 bg-white text-black px-16 py-4 rounded-2xl font-[1000] text-[10px] uppercase tracking-[0.5em] hover:bg-blue-600 hover:text-white transition-all shadow-xl active:scale-90">KEMBALI</button></div>';
+            }
+
+            lucide.createIcons();
+            window.scrollTo(0, 0);
+        };
+
+        window.togglePiP = async function() {
+            var video = document.getElementById('video-player');
+            try {
+                if (video !== document.pictureInPictureElement) {
+                    await video.requestPictureInPicture();
+                } else {
+                    await document.exitPictureInPicture();
+                }
+            } catch(e) {}
+        };
+
+        window.toggleFullscreen = function() {
+            var player = document.getElementById('video-player');
+            if (player.requestFullscreen) player.requestFullscreen();
+            else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(function() {});
+            }
+        };
+
+        // ═══════════════════════════════════════
+        // BOOT SEQUENCE
+        // ═══════════════════════════════════════
+        window.onload = function() {
+            if (_checkEnv()) {
+                initApp();
+            }
+        };
+
+        // Prevent copy/paste of source
+        document.addEventListener('copy', function(e) { e.preventDefault(); });
+        document.addEventListener('cut', function(e) { e.preventDefault(); });
+
+        // Detect page visibility changes (tab switching for screenshot tools)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                setTimeout(function() { _checkEnv(); }, 500);
+            }
+        });
+
+    })();
+    </script>
+</body>
+</html>
